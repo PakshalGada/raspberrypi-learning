@@ -40,3 +40,25 @@ h1 {
     background-color: #f0f0f0;
 }
 
+.video-container {
+    margin: 20px auto;
+    max-width: 640px;
+}
+
+.video-stream {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            display: block;
+            margin: 0 auto;
+        }
+
+img {
+    width: 100%;
+    height: auto;
+    border: 2px solid #333;
+    border-radius: 5px;
+}
+

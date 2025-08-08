@@ -6,10 +6,21 @@
 </head>
 <body>
     <div class='nav'>
-        <h1>Welcome, {{ username }}!</h1>
+    ok
+        <h1>ok Welcome, {{ username }}!</h1>
         <div class='dashAcc'>
             <a class='dashboardButton' href="{{ url_for('home') }}">Logout</a>
         </div>
     </div>
+    ok
+    <div class="video-container">
+    ok
+        <img id="videoStream" 
+                 class="video-stream" 
+                 src="{{ url_for('video_feed') }}" 
+                 alt="Live Video Stream"
+                 onerror="handleVideoError()">
+    </div>
 </body>
 </html>
+
