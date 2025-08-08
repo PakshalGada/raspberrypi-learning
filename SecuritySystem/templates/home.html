@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='loginStyles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='homeStyles.css') }}">
 </head>
 <body>
     <h1>Security System</h1><br>
-    <h2>Home Page</h2><br>
-    <a href="{{url_for('login')}}">Login</a><br>
-    <a href="{{url_for('register')}}">Register</a><br>
+    <div class="homeAcc">
+        <a class="homeButton" href="{{ url_for('login') }}">Login</a>
+        <a class="homeButton" href="{{ url_for('register') }}">Register</a>
+    </div>
 </body>
 </html>
