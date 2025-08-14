@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Camera</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboardStyles.css') }}">
+</head>
+<body onload="notifyMotionStart()" onbeforeunload="notifyMotionStop()">
+    <div class='nav'>
+        <h1>Live Camera Feed</h1>
+        <div class='dashAcc'>
+            <a class='dashboardButton' href="{{ url_for('aiCamera') }}">AI Camera</a>
+            <a class='dashboardButton' href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a class='dashboardButton' href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
+
+    <div class='video-container'>
+        <img src="{{ url_for('video_feed') }}" class="video-stream" alt="Video Stream">
+
+        <div class="button-row">
+            <button class='cameraButton' onclick="capturePhoto()">Capture Photo</button>
+            <button id="recordButton" class="cameraButton" onclick="toggleRecording()">Start Recording</button>
+        </div>
+    </div>
+
+    <script>
+        let isRecording = false;
+
+        if ("Notification" in window && Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
+        function showNotification(message) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification("Camera Notification", { body: message });
+            } else {
+                alert(message);
+            }
+        }
+
+        function capturePhoto() {
+            fetch('/capture')
+                .then(res => res.json())
+                .then(data => showNotification(data.message))
+                .catch(err => showNotification('Error capturing photo'));
+        }
+
+        function toggleRecording() {
+            fetch('/record')
+                .then(res => res.json())
+                .then(data => {
+                    isRecording = !isRecording;
+                    document.getElementById('recordButton').textContent = isRecording ? 'Stop Recording' : 'Start Recording';
+                    showNotification(data.message);
+                })
+                .catch(err => showNotification('Error toggling recording'));
+        }
+
+        function notifyMotionStart() {
+            fetch('/start_motion');
+        }
+
+        function notifyMotionStop() {
+            navigator.sendBeacon('/stop_motion');
+        }
+    </script>
+</body>
+</html>

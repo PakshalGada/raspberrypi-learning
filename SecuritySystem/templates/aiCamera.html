@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Camera</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboardStyles.css') }}">
+</head>
+<body>
+    <div class='nav'>
+        <h1>AI Camera</h1>
+        <div class='dashAcc'>
+            <a class='dashboardButton' href="{{ url_for('liveCamera') }}">Live Camera</a>
+            <a class='dashboardButton' href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a class='dashboardButton' href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
+    <div class='anotherPage'>
+        <a class='dashboardButton' href='{{url_for('takePhoto')}}'>Take Photo</a>
+        <button class='dashboardButton' onclick="document.getElementById('trainForm').style.display='block'">Train AI</button>
+        <a class='dashboardButton' href='{{url_for('facialRecognition')}}'>Facial Recognition</a>
+    </div>
+    <div id="trainForm" style="display:none;">
+        <form id="trainAIForm">
+            <label for="person">Person's Name (folder name):</label>
+            <input type="text" id="person" name="person" value="{{ username }}" required>
+            <button type="button" onclick="trainAI()">Start Training</button>
+        </form>
+    </div>
+    <script>
+        function trainAI() {
+            let person = document.getElementById('person').value;
+            if (!person) {
+                alert('Please enter the person\'s name.');
+                return;
+            }
+            fetch(`/train?person=${encodeURIComponent(person)}`)
+                .then(response => response.json())
+                .then(data => alert(data.message))
+                .catch(error => alert('Error: ' + error));
+        }
+    </script>
+</body>
+</html>

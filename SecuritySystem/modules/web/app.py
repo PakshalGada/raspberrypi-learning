@@ -2,9 +2,11 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 import sqlite3, json, os
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-from modules.camera.streaming import generate_frames, picam2
+from modules.camera.streaming import generate_frames, picam2,start_motion_detection,stop_motion_detection
 from picamera2.encoders import H264Encoder
 from picamera2.outputs import FileOutput
+from modules.ai.trainAI import train_model
+
 
 app = Flask(__name__, template_folder='../../templates', static_folder='../../static')
 app.secret_key = "picodersecuritycontrol"
@@ -39,6 +41,15 @@ def save_to_json(username, password):
     os.makedirs(os.path.dirname(JSON_PATH), exist_ok=True)
     with open(JSON_PATH, 'w') as f:
         json.dump(data, f, indent=4)
+
+def sanitize_folder_name(name):
+    """Sanitize the folder name by removing/replacing invalid characters"""
+    import re
+    # Remove or replace invalid characters for folder names
+    sanitized = re.sub(r'[<>:"/\\|?*]', '_', name)
+    # Remove leading/trailing spaces and dots
+    sanitized = sanitized.strip('. ')
+    return sanitized if sanitized else 'unknown_user'
 
 @app.route('/')
 def home():
@@ -83,6 +94,44 @@ def dashboard():
     if 'username' in session:
         return render_template('dashboard.html', username=session['username'])
     return redirect(url_for('login'))
+    
+@app.route('/liveCamera')
+def liveCamera():
+    if 'username' in session:
+        return render_template('liveCamera.html', username=session['username'])
+    return redirect(url_for('login'))
+    
+@app.route('/aiCamera')
+def aiCamera():
+    if 'username' in session:
+        return render_template('aiCamera.html', username=session['username'])
+    return redirect(url_for('login'))
+
+@app.route('/takePhoto')
+def takePhoto():
+    if 'username' in session:
+        return render_template('takePhoto.html', username=session['username'])
+    return redirect(url_for('login'))
+
+
+@app.route('/facialRecognition')
+def facialRecognition():
+    if 'username' in session:
+        return render_template('facialRecognition.html', username=session['username'])
+    return redirect(url_for('login'))
+
+@app.route('/train')
+def train():
+    if 'username' in session:
+        person = request.args.get('person')
+        if not person:
+            return jsonify(message="Error: Person name is required."), 400
+        try:
+            message = train_model(person)
+            return jsonify(message=message)
+        except Exception as e:
+            return jsonify(message=f"Error during training: {str(e)}"), 500
+    return jsonify(message="Unauthorized access."), 401
 
 @app.route('/video_feed')
 def video_feed():
@@ -95,6 +144,25 @@ def capture():
         filename = os.path.join('data', 'photos', f'photo_{timestamp}.jpg')
         picam2.capture_file(filename)
         return jsonify(message=f"Photo saved: {filename}")
+    except Exception as e:
+        return jsonify(message=f"Error: {e}"), 500
+
+@app.route('/capture_named')
+def capture_named():
+    try:
+        user_name = request.args.get('name', 'unknown_user')
+        sanitized_name = sanitize_folder_name(user_name)
+        
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        
+        user_photos_dir = os.path.join('data', 'photos', sanitized_name)
+        os.makedirs(user_photos_dir, exist_ok=True)
+        
+        filename = os.path.join(user_photos_dir, f'photo_{timestamp}.jpg')
+        
+        picam2.capture_file(filename)
+        
+        return jsonify(message=f"Photo saved for {user_name}: {filename}")
     except Exception as e:
         return jsonify(message=f"Error: {e}"), 500
 
@@ -116,9 +184,18 @@ def record():
             return jsonify(message="Recording stopped and saved.")
     except Exception as e:
         return jsonify(message=f"Error: {e}"), 500
+        
+@app.route('/start_motion')
+def start_motion():
+    start_motion_detection()
+    return jsonify(message="Motion detection started.")
+
+@app.route('/stop_motion')
+def stop_motion():
+    stop_motion_detection()
+    return jsonify(message="Motion detection stopped.")
 
 @app.route('/logout')
 def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
-
