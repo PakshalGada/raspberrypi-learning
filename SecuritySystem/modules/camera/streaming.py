@@ -125,7 +125,6 @@ def _camera_loop():
 
         time.sleep(0.005)
 
-# Motion detection start/stop
 def start_motion_detection():
     global _motion_thread, _motion_running
     if _motion_running:
@@ -188,7 +187,6 @@ def generate_frames():
         yield (b"--frame\r\n"
                b"Content-Type: image/jpeg\r\n\r\n" + jpg + b"\r\n")
 
-# Start only camera loop by default
 _thread_cam = threading.Thread(target=_camera_loop, daemon=True)
 _thread_cam.start()
 

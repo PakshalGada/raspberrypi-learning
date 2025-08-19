@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+    <title>Facial Recognition</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboardStyles.css') }}">
+</head>
+<body>
+    <div class='nav'>
+        <h1>AI Camera </h1>
+        <div class='dashAcc'>
+            <a class='dashboardButton' href="{{ url_for('aiCamera') }}">Back</a>
+            <a class='dashboardButton' href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a class='dashboardButton' href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
+    <div class="video-container">
+        <h2>Live Facial Recognition Feed</h2>
+        <img src="{{ url_for('facial_recognition_feed') }}" class="video-stream" alt="Facial Recognition Feed">
+    </div>
+    
+    <div id="message" style="text-align: center; margin: 10px; padding: 10px; border-radius: 5px; display: none;"></div>
+    </div>
+
+    <script>
+        function retrainFaces() {
+            fetch('/retrain_faces')
+                .then(response => response.json())
+                .then(data => {
+                    showMessage(data.message, 'success');
+                })
+                .catch(error => {
+                    showMessage('Failed to retrain faces', 'error');
+                });
+        }
+        
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.style.display = 'block';
+            messageDiv.style.backgroundColor = type === 'success' ? '#d4edda' : '#f8d7da';
+            messageDiv.style.color = type === 'success' ? '#155724' : '#721c24';
+            messageDiv.style.border = type === 'success' ? '1px solid #c3e6cb' : '1px solid #f5c6cb';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        window.addEventListener('beforeunload', function() {
+            fetch('/stop_facial_recognition');
+        });
+    </script>
+</body>
+</html>

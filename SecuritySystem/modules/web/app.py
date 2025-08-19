@@ -5,7 +5,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from modules.camera.streaming import generate_frames, picam2,start_motion_detection,stop_motion_detection
 from picamera2.encoders import H264Encoder
 from picamera2.outputs import FileOutput
-from modules.ai.trainAI import train_model
+from modules.ai.facialRecognition import FacialRecognitionCamera, train_faces
+
 
 
 app = Flask(__name__, template_folder='../../templates', static_folder='../../static')
@@ -16,6 +17,24 @@ JSON_PATH = os.path.join(os.path.dirname(__file__), '../../config/users.json')
 
 is_recording = False
 video_output = None
+facial_recognition_camera = None
+
+def generate_facial_recognition_frames():
+    global facial_recognition_camera
+    if facial_recognition_camera is None:
+        facial_recognition_camera = FacialRecognitionCamera(picam2)
+    
+    while True:
+        try:
+            frame = facial_recognition_camera.get_frame_with_recognition()
+            if frame:
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+        except Exception as e:
+            print(f"Error generating facial recognition frame: {e}")
+            break
+
+
 
 def init_db():
     with sqlite3.connect(DB_PATH) as conn:
@@ -113,25 +132,33 @@ def takePhoto():
         return render_template('takePhoto.html', username=session['username'])
     return redirect(url_for('login'))
 
+@app.route('/facial_recognition_feed')
+def facial_recognition_feed():
+    return Response(generate_facial_recognition_frames(), 
+                   mimetype='multipart/x-mixed-replace; boundary=frame')
+
 
 @app.route('/facialRecognition')
 def facialRecognition():
     if 'username' in session:
+        try:
+            result = train_faces()
+            flash(f'Training complete! Loaded {len(result["encodings"])} face encodings.', 'success')
+        except Exception as e:
+            flash(f'Training failed: {e}', 'error')
+        
         return render_template('facialRecognition.html', username=session['username'])
     return redirect(url_for('login'))
 
-@app.route('/train')
-def train():
-    if 'username' in session:
-        person = request.args.get('person')
-        if not person:
-            return jsonify(message="Error: Person name is required."), 400
-        try:
-            message = train_model(person)
-            return jsonify(message=message)
-        except Exception as e:
-            return jsonify(message=f"Error during training: {str(e)}"), 500
-    return jsonify(message="Unauthorized access."), 401
+
+
+def gen(camera):
+    while True:
+        frame = camera.get_frame()
+        if frame:
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
 
 @app.route('/video_feed')
 def video_feed():
@@ -184,6 +211,14 @@ def record():
             return jsonify(message="Recording stopped and saved.")
     except Exception as e:
         return jsonify(message=f"Error: {e}"), 500
+        
+@app.route('/stop_facial_recognition')
+def stop_facial_recognition():
+    global facial_recognition_camera
+    if facial_recognition_camera is not None:
+        del facial_recognition_camera
+        facial_recognition_camera = None
+    return jsonify(message="Facial recognition camera stopped")
         
 @app.route('/start_motion')
 def start_motion():

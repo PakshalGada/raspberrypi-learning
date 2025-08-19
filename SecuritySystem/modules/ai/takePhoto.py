@@ -4,23 +4,14 @@ from datetime import datetime
 from picamera2 import Picamera2
 
 def sanitize_folder_name(name):
-    """Sanitize the folder name by removing/replacing invalid characters"""
+
     import re
     sanitized = re.sub(r'[<>:"/\\|?*]', '_', name)
     sanitized = sanitized.strip('. ')
     return sanitized if sanitized else 'unknown_user'
 
 def take_photo_for_user(user_name, picam2_instance=None):
-    """
-    Take a photo for a specific user and save it in their folder
-    
-    Args:
-        user_name (str): Name of the user
-        picam2_instance: Existing Picamera2 instance (optional)
-    
-    Returns:
-        str: Path to the saved photo
-    """
+
     try:
         if picam2_instance is None:
             picam2 = Picamera2()
@@ -54,15 +45,7 @@ def take_photo_for_user(user_name, picam2_instance=None):
         return None
 
 def list_user_photos(user_name):
-    """
-    List all photos for a specific user
     
-    Args:
-        user_name (str): Name of the user
-    
-    Returns:
-        list: List of photo filenames
-    """
     sanitized_name = sanitize_folder_name(user_name)
     user_photos_dir = os.path.join('data', 'photos', sanitized_name)
     

@@ -50,21 +50,6 @@ h2 {
     margin-top: 15px;
 }
 
-.cameraButton {
-    padding: 8px 16px;
-    font-size: 16px;
-    background-color: white;
-    color: black;
-    border: 2px solid black;
-    border-radius: 5px;
-    cursor: pointer;
-    font-family: "Courier New", Courier, monospace;
-    transition: background-color 0.2s ease;
-}
-
-.cameraButton:hover {
-    background-color: #f0f0f0;
-}
 
 .anotherPage{
     display: flex;
@@ -90,7 +75,6 @@ h2 {
     max-width: 640px;
     height: auto;
     border-radius: 5px;
-    display: block;
     margin: 20px auto;
     border: 2px solid black;
 }
