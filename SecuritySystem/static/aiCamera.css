@@ -1,0 +1,196 @@
+body {
+    font-family: "Courier New", Courier, monospace;
+    margin: 0;
+    background-color: white;
+    min-height: 100vh;
+}
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 2px solid black;
+    background-color: white;
+}
+
+h1 {
+    margin: 0;
+    color: black;
+    font-size: 20px;
+}
+
+h2.page-title {
+    text-align: center;
+    color: black;
+    font-size: 22px;
+    margin: 20px 0;
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.anotherPage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 70px;
+    gap: 15px;
+    background-color: white;
+    margin: 10px;
+    border-radius: 8px;
+}
+
+.dashAcc {
+    display: flex;
+    gap: 15px;
+}
+
+.dashboardButton {
+    padding: 8px 16px;
+    font-size: 16px;
+    background-color: white;
+    color: black;
+    border: 2px solid black;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: "Courier New", Courier, monospace;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.dashboardButton:hover {
+    background-color: #f0f0f0;
+}
+
+.photo-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding: 20px;
+}
+
+.photo-card {
+    border: 2px solid black;
+    padding: 10px;
+    border-radius: 8px;
+    background: white;
+    text-align: center;
+    width: 200px;
+}
+
+.photo-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+.assign-form {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.photo-history {
+    margin-top: 20px;
+}
+
+.photo-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+.photo-item img {
+    width: 120px;
+    height: auto;
+    margin-right: 15px;
+    border-radius: 8px;
+    border: 2px solid #444;
+}
+
+.photo-info p {
+    margin: 3px 0;
+}
+
+.photo-info form {
+    margin-top: 5px;
+}
+
+.history-table {
+    width: 95%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: white;
+    border: 2px solid black;
+}
+
+.history-table th, .history-table td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.history-table th {
+    background: #f5f5f5;
+    font-weight: bold;
+}
+
+.history-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.assign-form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.assign-form select,
+.assign-form input {
+    padding: 4px;
+    font-size: 13px;
+}
+
+
+
+@media (max-width: 768px) {
+    .photo-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .assign-form {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .photo-row img {
+        width: 80px;
+        height: 80px;
+        align-self: center;
+    }
+    
+    .nav {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .dashAcc {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}

@@ -8,9 +8,9 @@ import io
 from PIL import Image
 from datetime import datetime
 
-DATASET_PATH = os.path.expanduser("/home/webbywonder/raspberrypi-learning/SecuritySystem/data/photos")
+DATASET_PATH = os.path.expanduser("/home/webbywonder/raspberrypi-learning/SecuritySystem/data/faceData")
 ENCODINGS_PATH = os.path.expanduser("/home/webbywonder/raspberrypi-learning/SecuritySystem/data/encodings.pickle")
-CAPTURED_PATH = os.path.expanduser("/home/webbywonder/raspberrypi-learning/SecuritySystem/data/photos_captured")
+CAPTURED_PATH = os.path.expanduser("/home/webbywonder/raspberrypi-learning/SecuritySystem/data/faceCaptured")
 
 def train_faces():
     known_encodings = []
@@ -97,7 +97,6 @@ class FacialRecognitionCamera:
         filename = os.path.join(save_dir, f"{name}_{timestamp}.jpg")
 
         try:
-            # Save the entire frame instead of cropped face
             cv2.imwrite(filename, image)
             print(f"[INFO] Saved full frame image for {name} at {filename}")
             self.captured_today.add(name)
@@ -150,7 +149,6 @@ class FacialRecognitionCamera:
                 font = cv2.FONT_HERSHEY_DUPLEX
                 cv2.putText(image, name, (left + 6, top - 6), font, 0.6, (0, 0, 0), 1)
 
-                # Save the entire frame with bounding boxes instead of cropped face
                 if len(names) > 0:  # Only save if at least one face is detected
                     self._save_person_image(image, name)
             

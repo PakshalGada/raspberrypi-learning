@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>AI Camera</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='dashboardStyles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='aiCamera.css') }}">
 </head>
 <body>
     <div class='nav'>
@@ -13,10 +13,34 @@
             <a class='dashboardButton' href="{{ url_for('logout') }}">Logout</a>
         </div>
     </div>
+    
     <div class='anotherPage'>
         <a class='dashboardButton' href='{{url_for('takePhoto')}}'>Add New Face</a>
-        <a class='dashboardButton' href='{{url_for('facialRecognition')}}'>Facial Recognition</a>
-        <a class='dashboardButton' href='{{url_for('unknownFaceCaptured')}}'>Unknown Face Captured</a>
+        <a class='dashboardButton' href='{{url_for('facialRecognition')}}'>Start Tracking</a>
     </div>
+    
+    <h2 class="page-title">History</h2>
+
+<div class="photo-history">
+    {% for photo in photos %}
+        <div class="photo-item">
+            <img src="{{ url_for('unknown_photos', filename=photo['path']) }}" alt="Captured Image">
+            <div class="photo-info">
+                <p><strong>Name:</strong> {{ photo['person'] }} | <strong>Date:</strong> {{ photo['date'] }} | <strong>Time:</strong> {{ photo['time'] }}</p>
+                
+                {% if photo['is_unknown'] %}
+                    <form method="POST" action="{{ url_for('assign_name') }}">
+                        <input type="hidden" name="photo_path" value="{{ photo['path'] }}">
+                        <input type="text" name="new_name" placeholder="Enter name">
+                        <button type="submit">Assign</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+
 </body>
 </html>
+

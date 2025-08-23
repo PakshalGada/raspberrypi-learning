@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, Response, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, session, Response, jsonify, send_from_directory
 import sqlite3, json, os
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -6,6 +6,9 @@ from modules.camera.streaming import generate_frames, picam2,start_motion_detect
 from picamera2.encoders import H264Encoder
 from picamera2.outputs import FileOutput
 from modules.ai.facialRecognition import FacialRecognitionCamera, train_faces
+from modules.ai.history import get_all_photos_with_names, get_existing_people, assign_photo
+
+
 
 
 
@@ -62,11 +65,9 @@ def save_to_json(username, password):
         json.dump(data, f, indent=4)
 
 def sanitize_folder_name(name):
-    """Sanitize the folder name by removing/replacing invalid characters"""
+
     import re
-    # Remove or replace invalid characters for folder names
     sanitized = re.sub(r'[<>:"/\\|?*]', '_', name)
-    # Remove leading/trailing spaces and dots
     sanitized = sanitized.strip('. ')
     return sanitized if sanitized else 'unknown_user'
 
@@ -123,8 +124,36 @@ def liveCamera():
 @app.route('/aiCamera')
 def aiCamera():
     if 'username' in session:
-        return render_template('aiCamera.html', username=session['username'])
+        photos = get_all_photos_with_names()
+        people = get_existing_people()
+        return render_template('aiCamera.html', username=session['username'], photos=photos, people=people)
     return redirect(url_for('login'))
+    
+    
+@app.route('/unknown_photos/<path:filename>')
+def unknown_photos(filename):
+    base_dir = os.path.join(os.path.dirname(__file__), '../../data')
+    return send_from_directory(base_dir, filename)
+
+@app.route('/assign_unknown', methods=["POST"])
+def assign_unknown():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    photo = request.form["photo"]
+    action = request.form["action"]
+
+    if action == "existing":
+        person = request.form["person"]
+        assign_photo(photo, person, create_new=False)
+    else:
+        person = request.form["new_person"].strip()
+        if person:
+            assign_photo(photo, person, create_new=True)
+
+    return redirect(url_for("unknownFaceCaptured"))
+
+
 
 @app.route('/takePhoto')
 def takePhoto():
@@ -151,7 +180,6 @@ def facialRecognition():
     return redirect(url_for('login'))
 
 
-
 def gen(camera):
     while True:
         frame = camera.get_frame()
@@ -173,6 +201,9 @@ def capture():
         return jsonify(message=f"Photo saved: {filename}")
     except Exception as e:
         return jsonify(message=f"Error: {e}"), 500
+        
+
+
 
 @app.route('/capture_named')
 def capture_named():

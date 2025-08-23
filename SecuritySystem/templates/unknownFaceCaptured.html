@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Camera</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='unknownFaceCaptured.css') }}">
+</head>
+<body>
+    <div class='nav'>
+        <h1>AI Camera</h1>
+        <div class='dashAcc'>
+            <a class='dashboardButton' href="{{ url_for('aiCamera') }}">Back</a>
+            <a class='dashboardButton' href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a class='dashboardButton' href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
+
+    <h2 class="page-title">Unknown Faces</h2>
+
+    {% if photos %}
+    <div class="faces-container">
+        {% for photo in photos %}
+        <div class="face-card">
+            <img src="{{ url_for('unknown_photos', filename=photo.replace('data/faceCaptured/','')) }}">
+            <form method="post" action="{{ url_for('assign_unknown') }}">
+                <input type="hidden" name="photo" value="{{ photo }}">
+
+                <div class="form-section">
+                    <label>Assign to existing:</label>
+                    <select name="person">
+                        {% for person in people %}
+                            <option value="{{ person }}">{{ person }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" name="action" value="existing">Move</button>
+                </div>
+
+                <hr>
+
+                <div class="form-section">
+                    <label>Or create new:</label>
+                    <input type="text" name="new_person" placeholder="Enter name">
+                    <button type="submit" name="action" value="new">Create + Move</button>
+                </div>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <div class="no-photos">🎉 No unknown photos left!</div>
+    {% endif %}
+</body>
+</html>
