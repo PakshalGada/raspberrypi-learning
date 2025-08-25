@@ -10,7 +10,6 @@ os.makedirs(FACE_CAPTURED, exist_ok=True)
 os.makedirs(FACE_DATA, exist_ok=True)
 
 
-
 def get_all_photos_with_names():
     photos = []
     for date_folder in os.listdir(FACE_CAPTURED):
@@ -25,14 +24,14 @@ def get_all_photos_with_names():
             person = filename.split("_")[0] if "_" in filename else "Unknown"
 
             try:
-                time_str = filename.split("_")[1].split(".")[0] 
+                time_str = filename.split("_")[1].split(".")[0]
             except Exception:
                 time_str = "00-00-00"
 
             try:
                 dt = datetime.strptime(f"{date_folder} {time_str}", "%Y-%m-%d %H-%M-%S")
             except Exception:
-                dt = datetime.min  
+                dt = datetime.min
 
             rel_path = os.path.join("faceCaptured", date_folder, filename)
 
@@ -42,23 +41,21 @@ def get_all_photos_with_names():
                 "date": date_folder,
                 "time": time_str.replace("-", ":"),
                 "is_unknown": (person.lower() == "unknown"),
-                "datetime": dt  
+                "datetime": dt
             })
 
     photos.sort(key=lambda x: x.get("datetime", datetime.min), reverse=True)
     return photos
 
 
-
 def get_existing_people():
-   
     if not os.path.exists(FACE_DATA):
         return []
     return [d for d in os.listdir(FACE_DATA) if os.path.isdir(os.path.join(FACE_DATA, d))]
 
 
 def assign_photo(photo_rel_path, person_name, create_new=False):
-   
+  
     src = os.path.join(BASE_DIR, photo_rel_path)
     if not os.path.exists(src):
         raise FileNotFoundError(f"Photo not found: {src}")
@@ -66,9 +63,17 @@ def assign_photo(photo_rel_path, person_name, create_new=False):
     person_dir = os.path.join(FACE_DATA, person_name)
     os.makedirs(person_dir, exist_ok=True)
 
-    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    dst = os.path.join(person_dir, f"{person_name}_{timestamp}.jpg")
+    timestamp = datetime.now().strftime("%H-%M-%S")
+    new_filename = f"{person_name}_{timestamp}.jpg"
+
+    dst = os.path.join(person_dir, new_filename)
     shutil.copy2(src, dst)
 
-    return dst
+    faceCaptured_new_path = os.path.join(os.path.dirname(src), new_filename)
+    os.rename(src, faceCaptured_new_path)
+
+    return {
+        "faceData_path": dst,
+        "faceCaptured_path": faceCaptured_new_path
+    }
 

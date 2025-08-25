@@ -63,6 +63,20 @@ h2.page-title {
     display: inline-block;
 }
 
+.textBox{
+    padding: 8px 16px;
+    font-size: 16px;
+    background-color: white;
+    color: black;
+    border: 2px solid black;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: "Courier New", Courier, monospace;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
 .dashboardButton:hover {
     background-color: #f0f0f0;
 }
@@ -132,17 +146,7 @@ h2.page-title {
     border: 2px solid black;
 }
 
-.history-table th, .history-table td {
-    border: 1px solid black;
-    padding: 8px;
-    text-align: center;
-    font-size: 14px;
-}
 
-.history-table th {
-    background: #f5f5f5;
-    font-weight: bold;
-}
 
 .history-img {
     width: 80px;

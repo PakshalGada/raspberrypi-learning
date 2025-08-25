@@ -9,9 +9,6 @@ from modules.ai.facialRecognition import FacialRecognitionCamera, train_faces
 from modules.ai.history import get_all_photos_with_names, get_existing_people, assign_photo
 
 
-
-
-
 app = Flask(__name__, template_folder='../../templates', static_folder='../../static')
 app.secret_key = "picodersecuritycontrol"
 
@@ -140,18 +137,29 @@ def assign_unknown():
     if 'username' not in session:
         return redirect(url_for('login'))
 
-    photo = request.form["photo"]
-    action = request.form["action"]
+    photo = request.form.get("photo") or request.form.get("photo_path")
+    if not photo:
+        flash("No photo provided", "error")
+        return redirect(url_for("aiCamera"))
 
+    action = request.form.get("action")
     if action == "existing":
-        person = request.form["person"]
-        assign_photo(photo, person, create_new=False)
-    else:
-        person = request.form["new_person"].strip()
+        person = request.form.get("person")
+        if person:
+            assign_photo(photo, person, create_new=False)
+            flash(f"Photo assigned to {person}", "success")
+    elif action == "new":
+        person = request.form.get("new_person", "").strip()
         if person:
             assign_photo(photo, person, create_new=True)
+            flash(f"Photo assigned to new person {person}", "success")
+    else:
+        new_name = request.form.get("new_name", "").strip()
+        if new_name:
+            assign_photo(photo, new_name, create_new=True)
+            flash(f"Photo assigned to new person {new_name}", "success")
 
-    return redirect(url_for("unknownFaceCaptured"))
+    return redirect(url_for("aiCamera"))
 
 
 

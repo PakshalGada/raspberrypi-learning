@@ -29,10 +29,10 @@
                 <p><strong>Name:</strong> {{ photo['person'] }} | <strong>Date:</strong> {{ photo['date'] }} | <strong>Time:</strong> {{ photo['time'] }}</p>
                 
                 {% if photo['is_unknown'] %}
-                    <form method="POST" action="{{ url_for('assign_name') }}">
-                        <input type="hidden" name="photo_path" value="{{ photo['path'] }}">
-                        <input type="text" name="new_name" placeholder="Enter name">
-                        <button type="submit">Assign</button>
+                    <form method="POST" action="{{ url_for('assign_unknown') }}">
+                        <input class="textBox" type="hidden" name="photo_path" value="{{ photo['path'] }}">
+                        <input class="textBox" type="text" name="new_name" placeholder="Enter name">
+                        <button type="submit" class="dashboardButton">Assign</button>
                     </form>
                 {% endif %}
             </div>
